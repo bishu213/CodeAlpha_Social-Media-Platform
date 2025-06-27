@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ConnectHub - Posts</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #1877f2;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .post {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: #fafafa;
+    }
+
+    .post-author {
+      font-weight: bold;
+      color: #1877f2;
+      margin-bottom: 0.5rem;
+    }
+
+    .post-content {
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .logout-btn {
+      display: block;
+      text-align: center;
+      margin: 1rem auto 0 auto;
+      background-color: #1877f2;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Posts</h1>
+    <div id="posts"></div>
+
+    <div>
+    <div></div>
+  </div>
+
+  <script>
+    async function fetchMyPosts() {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/posts/me', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = await res.json();
+
+      const postsDiv = document.getElementById('posts');
+      postsDiv.innerHTML = '';
+
+      if (data.length === 0) {
+        postsDiv.innerHTML = '<p>You have not created any posts yet.</p>';
+        return;
+      }
+
+      data.forEach(post => {
+        const postEl = document.createElement('div');
+        postEl.style = "border:1px solid #ddd; padding:1rem; margin-bottom:1rem; border-radius:6px;";
+        postEl.innerHTML = `
+          <p>${post.content}</p>
+          <small>${new Date(post.createdAt).toLocaleString()}</small>
+        `;
+        postsDiv.appendChild(postEl);
+      });
+    }
+
+    // Fetch on page load
+    fetchMyPosts();
+  </script>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    async function fetchPosts() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You must be logged in');
+        window.location.href = 'login.html';
+        return;
+      }
+
+    //   try {
+    //     const res = await fetch('http://localhost:5000/api/posts/me', {
+    //       headers: {
+    //         Authorization: 'Bearer ' + token
+    //       }
+    //     });
+
+    //     if (!res.ok) {
+    //       throw new Error('Error fetching posts');
+    //     }
+
+    //     const posts = await res.json();
+    //     const postsContainer = document.getElementById('posts');
+
+    //     if (posts.length === 0) {
+    //       postsContainer.innerHTML = '<p>No posts yet.</p>';
+    //       return;
+    //     }
+
+    //     posts.forEach(post => {
+    //       const div = document.createElement('div');
+    //       div.className = 'post';
+    //       div.innerHTML = `
+    //         <div class="post-author">${post.author?.name || 'Unknown'}</div>
+    //         <div class="post-content">${post.content}</div>
+    //       `;
+    //       postsContainer.appendChild(div);
+    //     });
+    //   } catch (err) {
+    //     console.error(err);
+    //     // alert('Failed to load posts');
+    //   }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    // Load posts on page load
+    fetchPosts();
+  </script>
+</body>
+</html>
